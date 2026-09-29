@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <title>Лабораторна робота: MVC</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; background-color: #f9f9f9; }
+        .container { max-width: 400px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        input { width: 70%; padding: 8px; box-sizing: border-box; }
+        button { padding: 8px 12px; cursor: pointer; }
+        ul { list-style-type: square; padding-left: 20px; }
+        li { padding: 4px 0; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h2>Списковий менеджер (MVC)</h2>
+        <input type="text" id="itemInput" placeholder="Введіть запис...">
+        <button id="addBtn">Додати</button>
+        
+        <h3>Список записів:</h3>
+        <ul id="itemList"></ul>
+    </div>
+
+    <script>
+        // 1. MODEL (Зберігає дані, містить прізвище автора)
+        class Model {
+            constructor() {
+                // Набір даних з вашим прізвищем
+                this.items = ["Сухолуцький", "Петренко", "Сидоренко"];
+            }
+
+            getItems() {
+                return this.items;
+            }
+
+            addItem(newItem) {
+                if (newItem.trim() !== "") {
+                    this.items.push(newItem);
+                }
+            }
+        }
+
+        // 2. VIEW (Відображає дані та зчитує події)
+        class View {
+            constructor() {
+                this.input = document.getElementById("itemInput");
+                this.addButton = document.getElementById("addBtn");
+                this.list = document.getElementById("itemList");
+            }
+
+            render(items) {
+                this.list.innerHTML = "";
+                items.forEach(item => {
+                    const li = document.createElement("li");
+                    li.textContent = item;
+                    this.list.appendChild(li);
+                });
+            }
+
+            bindAddItem(handler) {
+                this.addButton.addEventListener("click", () => {
+                    const value = this.input.value;
+                    handler(value);
+                    this.input.value = "";
+                });
+            }
+        }
+
+        // 3. CONTROLLER (Зв'язує Model та View)
+        class Controller {
+            constructor(model, view) {
+                this.model = model;
+                this.view = view;
+
+                // Початкове відображення
+                this.view.render(this.model.getItems());
+
+                // Підписка на події кнопки "Додати"
+                this.view.bindAddItem(this.handleAddItem.bind(this));
+            }
+
+            handleAddItem(item) {
+                this.model.addItem(item);
+                this.view.render(this.model.getItems());
+            }
+        }
+
+        // Запуск MVC-додатка
+        const app = new Controller(new Model(), new View());
+    </script>
+</body>
+</html>
